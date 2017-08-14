@@ -2,15 +2,30 @@
 
 """Console script for terrible."""
 
+import json
 import click
+from terrible import (state_pull, state_resources, state_hosts, query_list,
+                      query_host)
 
 
 @click.command()
-def main(args=None):
+@click.option('--host', help='Show varibles for single host')
+@click.option('listvars', '--list', is_flag=True, help='List all variables')
+@click.option('--nometa', is_flag=True, help='Remove _meta from output')
+@click.option('--pretty', is_flag=True, help='Make json look pretty')
+@click.argument('root', envvar='TERRAFORM_ROOT', default='terraform',
+                type=click.Path(exists=True))
+def main(host, listvars, nometa, pretty, root):
     """Console script for terrible."""
-    click.echo("Replace this message by putting your code into "
-               "terrible.cli.main")
-    click.echo("See click documentation at http://click.pocoo.org/")
+    hosts = state_hosts(state_resources(state_pull(root)))
+    if listvars:
+        output = query_list(hosts)
+        if nometa:
+            del output['_meta']
+        click.echo(json.dumps(output, indent=4 if pretty else None))
+    elif host:
+        output = query_host(hosts, host)
+        click.echo(json.dumps(output, indent=4 if pretty else None))
 
 
 if __name__ == "__main__":
