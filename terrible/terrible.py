@@ -17,7 +17,7 @@ def state_pull(root=None):
 
 def state_resources(sources):
     for source in sources:
-        if type(source) in [unicode, str]:
+        if type(source) in [str, str]:
             with open(source, 'r') as json_file:
                 state = json.load(json_file)
         else:

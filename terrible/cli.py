@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """Console script for terrible."""
+from __future__ import absolute_import
 
 import json
 import click
-from terrible import (state_pull, state_resources, state_hosts, query_list,
-                      query_host)
+from .terrible import (state_pull, state_resources, state_hosts, query_list,
+                       query_host)
 
 
 @click.command()
