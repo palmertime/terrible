@@ -18,7 +18,8 @@ terrible
      :alt: Updates
 
 
-Ansible dynamic inventory from Terraform
+Terrible (TERRaform to ansIBLE) creates dynamic Ansible inventory from Terraform
+state.
 
 
 * Free software: Apache Software License 2.0
@@ -28,7 +29,71 @@ Ansible dynamic inventory from Terraform
 Features
 --------
 
-* TODO
+Terraform Resources:
+^^^^^^^^^^^^^^^^^^^^
+
+* VMware vSphere (`vsphere_virtual_machine`_)
+
+.. _`vsphere_virtual_machine`: https://www.terraform.io/docs/providers/vsphere/r/virtual_machine.html
+
+Usage
+^^^^^
+
+**Help**::
+
+  Usage: terrible [OPTIONS] <root_dir>
+
+    Terrible extracts Ansible inventory data from Terraform state. The
+    <root_dir> is relative to the directory where Ansible is executed but
+    defaults to ./terraform in the current directory.
+
+  Options:
+    --host TEXT  Show varibles for single host
+    --list       List all variables
+    --nometa     Remove _meta from output
+    --pretty     Make json look pretty
+    --help       Show this message and exit.
+
+VMware
+^^^^^^
+
+When defining a Terraform ``vsphere_virtual_machine`` resource use the ``custom_configuration_parameters`` block to set Ansible parameters.
+
+**ansible_ssh_user**
+  The user that Ansible will connect with.
+
+**ansible_group**
+  The inventory group that is associated with the resource.
+
+Configuration example::
+
+    custom_configuration_parameters {
+      ansible_group = "api"
+      ansible_ssh_user = "ansible"
+    }
+
+Example
+^^^^^^^
+
+**Directory Layout**
+
+By default, Terrible looks for the ``terraform`` inside the Ansible playbook root directory.::
+
+    .
+    ├── ansible.cfg
+    ├── inventory
+    │   ├── group_vars
+    │   └── terrible.sh
+    ├── playbooks
+    │   └── site.yml
+    ├── requirements.yml
+    ├── roles
+    │   └── example_role
+    └── terraform
+        ├── terraform.tf
+        ├── terraform.tfstate
+        ├── terraform.tfvars
+        └── variables.tf
 
 Credits
 ---------
@@ -38,3 +103,6 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
+This package was greatly influenced by the `sean-abbott/terraform.py`_ project.
+
+.. _`sean-abbott/terraform.py`: https://github.com/sean-abbott/terraform.py

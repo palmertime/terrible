@@ -14,10 +14,13 @@ from .terrible import (state_pull, state_resources, state_hosts, query_list,
 @click.option('listvars', '--list', is_flag=True, help='List all variables')
 @click.option('--nometa', is_flag=True, help='Remove _meta from output')
 @click.option('--pretty', is_flag=True, help='Make json look pretty')
-@click.argument('root', envvar='TERRAFORM_ROOT', default='terraform',
+@click.argument('root', metavar='<root_dir>', envvar='TERRAFORM_ROOT', default='terraform',
                 type=click.Path(exists=True))
 def main(host, listvars, nometa, pretty, root):
-    """Console script for terrible."""
+    """Terrible extracts Ansible inventory data from Terraform state.
+    The <root_dir> is relative to the directory where ansible is executed but
+    defaults to ./terraform in the current directory.
+    """
     hosts = state_hosts(state_resources(state_pull(root)))
     if listvars:
         output = query_list(hosts)
