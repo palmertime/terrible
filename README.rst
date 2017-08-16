@@ -41,12 +41,14 @@ Installation
 ^^^^^^^^^^^^
 
 To install terrible, run this command in your terminal.::
+
   $ pip install terrible
 
 Once installed a symbolic link or shell script can be added to the Ansible
 inventory directory.
 
 Symbolic link.::
+
   $ ln -s /path/to/terrible inventory/terrible
 
 Simple shell script wrapper.::
@@ -57,7 +59,7 @@ Simple shell script wrapper.::
 Usage
 ^^^^^
 
-**Help**::
+::
 
   Usage: terrible [OPTIONS] <root_dir>
 
