@@ -52,6 +52,7 @@ Symbolic link.::
   $ ln -s /path/to/terrible inventory/terrible
 
 Simple shell script wrapper.::
+  
   #!/usr/bin/env bash
   terrible "$@"
 
