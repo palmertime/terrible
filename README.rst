@@ -36,6 +36,24 @@ Terraform Resources:
 
 .. _`vsphere_virtual_machine`: https://www.terraform.io/docs/providers/vsphere/r/virtual_machine.html
 
+
+Installation
+^^^^^^^^^^^^
+
+To install terrible, run this command in your terminal.::
+  $ pip install terrible
+
+Once installed a symbolic link or shell script can be added to the Ansible
+inventory directory.
+
+Symbolic link.::
+  $ ln -s /path/to/terrible inventory/terrible
+
+Simple shell script wrapper.::
+  #!/usr/bin/env bash
+  terrible "$@"
+
+
 Usage
 ^^^^^
 
@@ -68,14 +86,13 @@ When defining a Terraform ``vsphere_virtual_machine`` resource use the ``custom_
 Configuration example::
 
     custom_configuration_parameters {
-      ansible_group = "api"
+      ansible_group = "api-gateway"
       ansible_ssh_user = "ansible"
     }
 
-Example
-^^^^^^^
 
-**Directory Layout**
+Directory Layout
+^^^^^^^^^^^^^^^^
 
 By default, Terrible looks for the ``terraform`` inside the Ansible playbook root directory.::
 
@@ -83,7 +100,7 @@ By default, Terrible looks for the ``terraform`` inside the Ansible playbook roo
     ├── ansible.cfg
     ├── inventory
     │   ├── group_vars
-    │   └── terrible.sh
+    │   └── terrible
     ├── playbooks
     │   └── site.yml
     ├── requirements.yml
@@ -96,7 +113,7 @@ By default, Terrible looks for the ``terraform`` inside the Ansible playbook roo
         └── variables.tf
 
 Credits
----------
+-------
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
