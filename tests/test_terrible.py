@@ -3,7 +3,8 @@
 
 """Tests for `terrible` package."""
 
-
+import shutil
+import tempfile
 import unittest
 from click.testing import CliRunner
 
@@ -16,9 +17,11 @@ class TestTerrible(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
+        self.test_dir = tempfile.mkdtemp()
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
+        shutil.rmtree(self.test_dir)
 
     def test_000_something(self):
         """Test something."""
@@ -26,9 +29,9 @@ class TestTerrible(unittest.TestCase):
     def test_command_line_interface(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.main)
-        assert result.exit_code == 2
-        assert 'Error: Invalid value for "root"' in result.output
+        result = runner.invoke(cli.main, [self.test_dir])
+        assert result.exit_code == 0
+        assert '' in result.output
         help_result = runner.invoke(cli.main, ['--help'])
         assert help_result.exit_code == 0
         assert '--help       Show this message and exit.' in help_result.output
