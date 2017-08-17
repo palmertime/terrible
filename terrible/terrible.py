@@ -11,7 +11,7 @@ def state_pull(root=None):
     """Gather tfstate output from terraform."""
     root = root
     getstate = Popen(['terraform', 'state', 'pull'], cwd=root, stdout=PIPE)
-    output = getstate.stdout.read()
+    output, _ = getstate.communicate()
     yield json.loads(output)
 
 
