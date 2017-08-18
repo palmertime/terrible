@@ -84,13 +84,13 @@ Common Parameters
 These can be specified by all resources. Uniq configuration details are
 documented in specific sections below.
 
-**ansible_user**(Optional)
+**ansible_user** (Optional)
   The user that Ansible will connect to the host. Defaults to root if not specified.
 
-**ansible_group**(Optional)
+**ansible_group** (Optional)
   The inventory group associated with the resource. (Add default All group?)
 
-**ansible_host**(Optional)
+**ansible_host** (Optional)
   The host that Ansible will connect to. VMware defaults to IP of 1st interface,
   ``network_interface:0`` but if can be overwriten to an specific IP. AWS
   defaults to ``public_ip`` and configuralbe to ``private_ip``.
