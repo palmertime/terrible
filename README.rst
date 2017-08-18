@@ -26,19 +26,8 @@ state.
 * Documentation: https://terrible.readthedocs.io.
 
 
-Features
---------
-
-Terraform Resources:
-^^^^^^^^^^^^^^^^^^^^
-
-* VMware vSphere (`vsphere_virtual_machine`_)
-
-.. _`vsphere_virtual_machine`: https://www.terraform.io/docs/providers/vsphere/r/virtual_machine.html
-
-
 Installation
-^^^^^^^^^^^^
+------------
 
 To install terrible, run this command in your terminal.::
 
@@ -52,13 +41,13 @@ Symbolic link.::
   $ ln -s /path/to/terrible inventory/terrible
 
 Simple shell script wrapper.::
-  
+
   #!/usr/bin/env bash
   terrible "$@"
 
 
 Usage
-^^^^^
+-----
 
 ::
 
@@ -75,23 +64,74 @@ Usage
     --pretty     Make json look pretty
     --help       Show this message and exit.
 
+
+Features
+--------
+
+Terraform Resources:
+^^^^^^^^^^^^^^^^^^^^
+
+* VMware vSphere (`vsphere_virtual_machine`_)
+
+.. _`vsphere_virtual_machine`: https://www.terraform.io/docs/providers/vsphere/r/virtual_machine.html
+
+
+Common Parameters
+^^^^^^^^^^^^^^^^^
+
+These can be specified by all resources. Uniq configuration details are
+documented in specific sections below.
+
+**ansible_user**(Optional)
+  The user that Ansible will connect to the host. Defaults to root if not specified.
+
+**ansible_group**(Optional)
+  The inventory group associated with the resource. (Add default All group?)
+
+**ansible_host**(Optional)
+  The host that Ansible will connect to. VMware defaults to IP of 1st interface,
+  ``network_interface:0`` but if can be overwriten to an specific IP. AWS
+  defaults to ``public_ip`` and configuralbe to ``private_ip``.
+  (TODO:  Add test and error condition for values)
+
+
 VMware
 ^^^^^^
 
-When defining a Terraform ``vsphere_virtual_machine`` resource use the ``custom_configuration_parameters`` block to set Ansible parameters.
-
-**ansible_ssh_user**
-  The user that Ansible will connect with.
-
-**ansible_group**
-  The inventory group that is associated with the resource.
+When defining Terraform ``vsphere_virtual_machine`` resource use the
+``custom_configuration_parameters`` block to set Ansible parameters.
 
 Configuration example::
 
     custom_configuration_parameters {
       ansible_group = "api-gateway"
-      ansible_ssh_user = "ansible"
+      ansible_user = "ansible"
+      ansible_host = "192.168.52.101"
     }
+
+
+AWS
+^^^
+
+When defining a Terraform ``aws-instance`` resource use tags to set Ansible
+parameters.
+
+**ansible_ssh_private_key_file**
+  The key used to connect to AWS instance. The value is the path to the private
+  key that matches the defined AWS instance key_name. Defaults to the value of
+  ``key_name + .pem``. EXAMPLE: If your AWS instance key_name is ``terraform``
+  then Ansible would look in the current working directory for terraform.pem
+
+Configuration example::
+
+    tags {
+      Name = "app1-aws"
+      ansible_groups = "webapp"
+      ansible_user = "ansible"
+      ansible_host = "private_ip"
+      ansible_ssh_private_key_file = "aws-keys/webapp-terraform.pem"
+    }
+
 
 
 Directory Layout

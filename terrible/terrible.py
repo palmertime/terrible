@@ -51,8 +51,32 @@ def parses(prefix):
     return inner
 
 
+def parse_attr_list(source, prefix, sep='.'):
+    attrs = defaultdict(dict)
+    for compkey, value in _parse_prefix(source, prefix, sep):
+        idx, key = compkey.split(sep, 1)
+        attrs[idx][key] = value
+
+    return list(attrs.values())
+
+
 def parse_dict(source, prefix, sep='.'):
     return dict(_parse_prefix(source, prefix, sep))
+
+
+def parse_list(source, prefix, sep='.'):
+    return [value for _, value in _parse_prefix(source, prefix, sep)]
+
+
+def parse_bool(string_form):
+    token = string_form.lower()[0]
+
+    if token == 't':
+        return True
+    elif token == 'f':
+        return False
+    else:
+        raise ValueError('could not convert %r to a bool' % string_form)
 
 
 def _parse_prefix(source, prefix, sep='.'):
@@ -75,30 +99,67 @@ def vsphere_host(resource, module_name, **kwargs):
     network = parse_dict(network_attrs, '0')
     ip_address = network.get('ipv4_address', network['ip_address'])
     name = raw_attrs['name']
+    metadata = parse_dict(raw_attrs, 'custom_configuration_parameters')
     groups = []
 
     attrs = {
-        'id': raw_attrs['id'],
-        'ip_address': ip_address,
-        'private_ipv4': ip_address,
-        'public_ipv4': ip_address,
-        'metadata': parse_dict(raw_attrs, 'custom_configuration_parameters'),
         'provider': 'vsphere',
     }
 
     try:
         attrs.update({
-            'ansible_ssh_host': ip_address,
+            'ansible_host': ip_address,
         })
     except (KeyError, ValueError):
-        attrs.update({'ansible_ssh_host': '', })
+        attrs.update({'ansible_host': '', })
+
+    if 'ansible_user' in metadata:
+        attrs['ansible_user'] = metadata['ansible_user']
+    else:
+        attrs['ansible_user'] = 'root'
+
+    if 'ansible_host' in metadata:
+        attrs['ansible_host'] = metadata['ansible_host']
+
+    if 'ansible_group' in metadata:
+        groups.append(metadata.get('ansible_group'))
+
+
+    return name, attrs, groups
+
+
+@parses('aws_instance')
+def aws_host(resource, module_name, **kwargs):
+    raw_attrs = resource['primary']['attributes']
+    if 'tags.Name' in raw_attrs:
+        name = raw_attrs['tags.Name']
+    else:
+        name = resource['id']
+
+    groups = []
+
+    attrs = {
+        'provider': 'aws',
+        'ansible_host': raw_attrs['public_ip'],
+    }
+    attrs['ansible_ssh_private_key_file'] = raw_attrs['key_name'] + ".pem"
 
     # attrs specific to Ansible
-    if 'ssh_user' in attrs['metadata']:
-        attrs['ansible_ssh_user'] = attrs['metadata']['ssh_user']
+    if 'tags.ansible_user' in raw_attrs:
+        attrs['ansible_user'] = raw_attrs['tags.ansible_user']
+    else:
+        attrs['ansible_user'] = 'root'
 
-    if 'ansible_group' in attrs['metadata']:
-        groups.append(attrs['metadata'].get('ansible_group'))
+    if 'tags.ansible_host' in raw_attrs:
+        if raw_attrs['tags.ansible_host'] == 'private_ip':
+            attrs['ansible_host'] = raw_attrs['private_ip']
+
+    if 'tags.ansible_ssh_private_key_file' in raw_attrs:
+        attrs['ansible_ssh_private_key_file'] = raw_attrs[
+            'tags.ansible_ssh_private_key_file']
+
+    if 'tags.ansible_groups' in raw_attrs:
+        groups.append(raw_attrs['tags.ansible_groups'])
 
     return name, attrs, groups
 
