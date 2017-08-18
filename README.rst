@@ -72,8 +72,10 @@ Terraform Resources:
 ^^^^^^^^^^^^^^^^^^^^
 
 * VMware vSphere (`vsphere_virtual_machine`_)
+* AWS Instance (`aws_instance`_)
 
 .. _`vsphere_virtual_machine`: https://www.terraform.io/docs/providers/vsphere/r/virtual_machine.html
+.. _`aws_instance`: https://www.terraform.io/docs/providers/aws/r/instance.html
 
 
 Common Parameters
