@@ -26,7 +26,7 @@ test_requirements = [
 
 setup(
     name='terrible',
-    version='0.1.0',
+    version='0.1.1',
     description="Ansible dynamic inventory from Terraform",
     long_description=readme + '\n\n' + history,
     author="Michael J. Palmer",
